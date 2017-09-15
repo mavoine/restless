@@ -1,4 +1,5 @@
 from functools import wraps
+import logging
 import sys
 
 from .constants import OK, CREATED, ACCEPTED, NO_CONTENT
@@ -7,6 +8,9 @@ from .exceptions import MethodNotImplemented, Unauthorized
 from .preparers import Preparer
 from .serializers import JSONSerializer
 from .utils import format_traceback
+
+
+logger = logging.getLogger(__name__)
 
 
 def skip_prepare(func):
@@ -286,6 +290,7 @@ class Resource(object):
             data = view_method(*args, **kwargs)
             serialized = self.serialize(method, endpoint, data)
         except Exception as err:
+            logger.exception("An error occurred")
             return self.handle_error(err)
 
         status = self.status_map.get(self.http_methods[endpoint][method], OK)
